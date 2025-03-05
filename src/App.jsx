@@ -2,13 +2,16 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import "./App.css";
 import { useSearchParams } from "react-router-dom";
+import PlaylistModal from "./PlaylistModal";
 
 function App() {
   const [accessToken, setAccessToken] = useState("");
   const [playlists, setPlaylists] = useState([]);
   const [selectedPlaylist, setSelectedPlaylist] = useState(null);
   const [tracks, setTracks] = useState([]);
-  const [duplicates, setDuplicates] = useState([]);
+  // const [duplicates, setDuplicates] = useState([]);
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [currentPlaylist, setCurrentPlaylist] = useState("");
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -96,26 +99,31 @@ function App() {
     }
   };
 
-  // const fetchTracks = async (playlistId) => {
-  //   if (!accessToken) return;
-  //   try {
-  //     const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
-  //       headers: { Authorization: `Bearer ${accessToken}` },
-  //     });
+  const fetchTracks = async (playlistId, playlistName) => {
+    if (!accessToken) return;
+    try {
+      const response = await axios.get(
+        `https://api.spotify.com/v1/playlists/${playlistId}/tracks`,
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        }
+      );
 
-  //     const tracks = response.data.items.map((item) => ({
-  //       id: item.track.id,
-  //       name: item.track.name,
-  //       artist: item.track.artists.map((artist) => artist.name).join(', '),
-  //       uri: item.track.uri,
-  //     }));
-  //     setTracks(tracks);
-  //     setSelectedPlaylist(playlistId);
-  //     detectDuplicates(tracks);
-  //   } catch (error) {
-  //     console.error('Error fetching playlist tracks:', error);
-  //   }
-  // };
+      const tracks = response.data.items.map((item) => ({
+        id: item.track.id,
+        name: item.track.name,
+        artist: item.track.artists.map((artist) => artist.name).join(", "),
+        uri: item.track.uri,
+      }));
+      setTracks(tracks);
+      setSelectedPlaylist(playlistId);
+      setCurrentPlaylist(playlistName);
+      setModalOpen(true);
+      // detectDuplicates(tracks);
+    } catch (error) {
+      console.error("Error fetching playlist tracks:", error);
+    }
+  };
 
   const fetchAllPlaylistsTracks = async () => {
     console.log("Fetching all playlists' tracks...");
@@ -169,6 +177,16 @@ function App() {
     detectPlaylistDuplicates(trackMap);
   };
 
+  const openModal = (playlist) => {
+    setModalOpen(true);
+    setSelectedPlaylist(playlist);
+  };
+
+  const closeModal = (playlist) => {
+    setModalOpen(false);
+    setSelectedPlaylist("");
+  };
+
   // const detectDuplicates = (tracks) => {
   //   const trackCount = {};
   //   const duplicateTracks = [];
@@ -216,7 +234,11 @@ function App() {
           <button onClick={fetchPlaylists}>Fetch My Playlists</button>
           <div className="playlists">
             {playlists.map((playlist) => (
-              <div key={playlist.id} className="playlist-card">
+              <div
+                key={playlist.id}
+                className="playlist-card"
+                onClick={() => fetchTracks(playlist.id, playlist.name)}
+              >
                 <img
                   src={playlist.images[0]?.url}
                   alt={playlist.name}
@@ -230,45 +252,12 @@ function App() {
               </div>
             ))}
           </div>
-
-          {selectedPlaylist && (
-            <div>
-              <h2>Tracks in Selected Playlist</h2>
-              <ul>
-                {tracks.map((track) => (
-                  <li key={track.id}>
-                    {track.name} - {track.artist}
-                  </li>
-                ))}
-              </ul>
-
-              {/* <h2>Duplicate Songs</h2>
-              {duplicates.length > 0 ? (
-                <ul>
-                  {duplicates.map((track, index) => (
-                    <li key={index}>
-                      {track.name} - {track.artist}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No duplicates found! 🎉</p>
-              )} */}
-              <h2>Duplicate Songs Across Playlists</h2>
-              {duplicates.length > 0 ? (
-                <ul>
-                  {duplicates.map((track, index) => (
-                    <li key={index}>
-                      {track.name} <br />
-                      <small>Appears in: {track.playlists.join(", ")}</small>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No duplicates found across playlists! 🎉</p>
-              )}
-            </div>
-          )}
+          <PlaylistModal
+            isOpen={isModalOpen}
+            onClose={() => setModalOpen(false)}
+            playlistName={currentPlaylist}
+            tracks={tracks}
+          />
         </div>
       )}
     </div>

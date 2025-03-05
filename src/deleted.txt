@@ -1,0 +1,38 @@
+{selectedPlaylist && (
+            <div>
+              <h2>Tracks</h2>
+              <ul>
+                {tracks.map((track) => (
+                  <li key={track.id}>
+                    {track.name} - {track.artist}
+                  </li>
+                ))}
+              </ul>
+
+              {/* <h2>Duplicate Songs</h2>
+              {duplicates.length > 0 ? (
+                <ul>
+                  {duplicates.map((track, index) => (
+                    <li key={index}>
+                      {track.name} - {track.artist}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No duplicates found! 🎉</p>
+              )} */}
+              {/* <h2>Duplicate Songs Across Playlists</h2>
+              {duplicates.length > 0 ? (
+                <ul>
+                  {duplicates.map((track, index) => (
+                    <li key={index}>
+                      {track.name} <br />
+                      <small>Appears in: {track.playlists.join(", ")}</small>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>No duplicates found across playlists! 🎉</p>
+              )} */}
+            </div>
+          )}
