@@ -41,17 +41,12 @@
   color: #888;
 } */
 
-<<<<<<< HEAD
-=======
 /* Playlist Customization */
->>>>>>> 75988e278bb432148071a9ac5a793d0cf7166ee6
 .playlists {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
   padding: 10px;
-<<<<<<< HEAD
-=======
 }
 
 .playlist-card {
@@ -126,7 +121,6 @@
   position: absolute;
   right: 10px;
   top: 10px;
->>>>>>> 75988e278bb432148071a9ac5a793d0cf7166ee6
 }
 
 .playlist-card {
